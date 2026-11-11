@@ -2,7 +2,7 @@
   "name": "cruciblecpp-vscode",
   "displayName": "CrucibleCpp Preprocessor",
   "description": "Run the CrucibleCpp preprocessor on the current C/C++ file, inspect the result, and compare it with g++ -E.",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "publisher": "tomatoOyster",
   "license": "MIT",
   "repository": {

@@ -15,7 +15,7 @@ The preprocessor is maintained at
 - Read include paths and defines from `compile_commands.json`.
 - Show the GCC path and include directories discovered by CrucibleCpp.
 - Animate the macro expansion trace in a webview.
-- Render the include graph in a webview; click a node to open the file.
+- Explore an interactive include graph: wheel zoom, background pan, draggable nodes, click to open a file.
 
 ## Requirements
 
