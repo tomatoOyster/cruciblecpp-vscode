@@ -7,13 +7,37 @@ export interface IncludeEdge {
   angled: boolean;
 }
 
+export interface MacroTraceArgument {
+  raw: string;
+  expanded: string;
+}
+
+export interface MacroTraceStep {
+  operation: string;
+  before: string;
+  after: string;
+}
+
 export interface MacroTraceEvent {
+  id?: number;
+  parentId?: number;
   macro: string;
+  kind?: string;
   file: string;
   line: number;
   column: number;
+  offset?: number;
+  length?: number;
   depth: number;
+  invocation?: string;
+  sourceLine?: string;
+  definitionFile?: string;
+  definitionLine?: number;
+  definitionColumn?: number;
+  definitionText?: string;
   replacement: string;
+  arguments?: MacroTraceArgument[];
+  steps?: MacroTraceStep[];
 }
 
 export interface AnalysisData {

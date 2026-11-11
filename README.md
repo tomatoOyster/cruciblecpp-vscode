@@ -14,7 +14,15 @@ The preprocessor is maintained at
 - Compare CrucibleCpp output with `g++ -E` using VS Code's diff editor.
 - Read include paths and defines from `compile_commands.json`.
 - Show the GCC path and include directories discovered by CrucibleCpp.
-- Animate the macro expansion trace in a webview.
+- Debug macro expansion in a webview:
+  - source highlight and Reveal
+  - call tree with parent/child events
+  - Step Into / Step Over / Step Out
+  - raw and expanded arguments
+  - `#` / `##` steps
+  - token-level diff
+  - hotspots, playback speed, loop, search
+  - open the generated `.i`
 - Explore an interactive include graph: wheel zoom, background pan, draggable nodes, click to open a file.
 
 ## Requirements

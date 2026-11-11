@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { parseAnalysis } from "../core/analysis";
-import { macroAnimationHtml } from "../ui/analysisWebview";
+import { macroAnimationHtml } from "../ui/macroAnimation";
 import { includeGraphHtml } from "../ui/includeGraph";
 
 const data = {

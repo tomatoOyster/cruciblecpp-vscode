@@ -15,7 +15,7 @@ import { parseAnalysis } from "./core/analysis";
 import { parseDiagnostics } from "./core/diagnostics";
 import { resolveExecutable, resolveGcc } from "./core/paths";
 import { runProcess, ProcessResult } from "./core/process";
-import { macroAnimationHtml } from "./ui/analysisWebview";
+import { macroAnimationHtml } from "./ui/macroAnimation";
 import { includeGraphHtml } from "./ui/includeGraph";
 
 const PREVIEW_SCHEME = "cruciblecpp-preview";
@@ -496,7 +496,59 @@ async function commandMacroAnimation(
     vscode.ViewColumn.Beside,
     { enableScripts: true, retainContextWhenHidden: true },
   );
-  panel.webview.html = macroAnimationHtml(data, document.uri.fsPath, randomNonce());
+  panel.webview.onDidReceiveMessage((message: unknown) => {
+    if (!message || typeof message !== "object") {
+      return;
+    }
+    const value = message as {
+      type?: string;
+      file?: string;
+      line?: number;
+      column?: number;
+      length?: number;
+      path?: string;
+    };
+    if (value.type === "open-output" && value.path) {
+      void vscode.window.showTextDocument(vscode.Uri.file(value.path), {
+        preview: true,
+      });
+      return;
+    }
+    if (value.type === "reveal" && value.file) {
+      const target = path.isAbsolute(value.file)
+        ? value.file
+        : path.resolve(workspaceRoot(document), value.file);
+      if (!fs.existsSync(target)) {
+        vscode.window.showWarningMessage(
+          `CrucibleCpp: source file no longer exists: ${target}`,
+        );
+        return;
+      }
+      const line = Math.max(0, (value.line ?? 1) - 1);
+      const column = Math.max(0, (value.column ?? 1) - 1);
+      const length = Math.max(0, value.length ?? 0);
+      vscode.workspace.openTextDocument(vscode.Uri.file(target)).then((doc) => {
+        const safeLine = Math.min(line, Math.max(0, doc.lineCount - 1));
+        const lineText = doc.lineAt(safeLine).text;
+        const safeColumn = Math.min(column, lineText.length);
+        const start = new vscode.Position(safeLine, safeColumn);
+        const end = new vscode.Position(
+          safeLine,
+          Math.min(lineText.length, safeColumn + length),
+        );
+        void vscode.window.showTextDocument(doc, {
+          selection: new vscode.Range(start, end),
+          preview: true,
+        });
+      });
+    }
+  });
+  panel.webview.html = macroAnimationHtml(
+    data,
+    document.uri.fsPath,
+    randomNonce(),
+    outcome.outputPath,
+  );
 }
 
 async function commandIncludeGraph(
