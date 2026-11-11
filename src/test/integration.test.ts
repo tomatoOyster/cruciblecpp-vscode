@@ -60,4 +60,28 @@ describe.skipIf(!fs.existsSync(executable))("CLI integration", () => {
       fs.rmSync(directory, { recursive: true, force: true });
     }
   });
+
+  it("parses a real preprocessing failure", async () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "cruciblecpp-vscode-"));
+    try {
+      const source = path.join(directory, "broken.cpp");
+      const output = path.join(directory, "broken.i");
+      fs.writeFileSync(source, '#include "missing-header.h"\n', "utf8");
+      const args = buildPreprocessArgs(
+        source,
+        output,
+        settings,
+        emptyFlags(),
+      );
+      const result = await runProcess(executable, args, directory);
+      expect(result.code).not.toBe(0);
+      const diagnostics = parseDiagnostics(result.stderr);
+      expect(diagnostics.length).toBeGreaterThan(0);
+      expect(diagnostics[0].severity).toBe("error");
+      expect(diagnostics[0].file).toContain("broken.cpp");
+      expect(diagnostics[0].message).toContain("missing-header.h");
+    } finally {
+      fs.rmSync(directory, { recursive: true, force: true });
+    }
+  });
 });
