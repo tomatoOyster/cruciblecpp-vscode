@@ -171,10 +171,20 @@ export function macroAnimationHtml(
       <button id="next" class="secondary">Next</button>
       <input id="search" placeholder="Find macro..." title="Enter to jump to the next matching macro">
       <select id="speed" title="Playback speed">
+        <option value="0.1">0.1x</option>
+        <option value="0.2">0.2x</option>
+        <option value="0.3">0.3x</option>
         <option value="0.5">0.5x</option>
+        <option value="0.75">0.75x</option>
         <option value="1" selected>1x</option>
+        <option value="1.25">1.25x</option>
+        <option value="1.5">1.5x</option>
+        <option value="1.75">1.75x</option>
         <option value="2">2x</option>
+        <option value="3">3x</option>
         <option value="4">4x</option>
+        <option value="6">6x</option>
+        <option value="8">8x</option>
       </select>
       <label class="subtle"><input id="loop" type="checkbox"> Loop</label>
     </div>
