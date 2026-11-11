@@ -15,10 +15,8 @@ import { parseAnalysis } from "./core/analysis";
 import { parseDiagnostics } from "./core/diagnostics";
 import { resolveExecutable, resolveGcc } from "./core/paths";
 import { runProcess, ProcessResult } from "./core/process";
-import {
-  includeGraphHtml,
-  macroAnimationHtml,
-} from "./ui/analysisWebview";
+import { macroAnimationHtml } from "./ui/analysisWebview";
+import { includeGraphHtml } from "./ui/includeGraph";
 
 const PREVIEW_SCHEME = "cruciblecpp-preview";
 
