@@ -73,9 +73,7 @@ For GCC comparison and GCC info, set `cruciblecpp.gccPath` if `g++.exe` is not o
 - `CrucibleCpp: Show GCC Info`
 - `CrucibleCpp: Show Output`
 
-The macro animation and include graph require a preprocessor build with
-`--analysis-json` support (the local development build includes it; the
-`v2.1.0` release does not).
+The macro animation and include graph require CrucibleCpp **2.2.0** or newer, which adds `--analysis-json` support.
 
 ## `compile_commands.json`
 
