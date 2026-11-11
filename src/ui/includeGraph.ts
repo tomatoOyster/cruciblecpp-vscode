@@ -59,7 +59,7 @@ export function includeGraphHtml(data: AnalysisData, nonce: string): string {
 </head>
 <body>
   <h1>Include graph</h1>
-  <div class="subtle">Click a node to open it. Start with a shallow depth, then expand.</div>
+  <div class="subtle">Click a node to open it. Wheel over the graph to zoom; drag the scrollbars to pan.</div>
   <div class="toolbar">
     <label>Depth <input id="depth" type="range" min="0" value="2"><span id="depthLabel">2</span></label>
     <button id="all">Show all</button>
@@ -129,6 +129,24 @@ export function includeGraphHtml(data: AnalysisData, nonce: string): string {
     svg.appendChild(edgeLayer);
     svg.appendChild(nodeLayer);
     wrap.appendChild(svg);
+
+    wrap.addEventListener('wheel', (event) => {
+      event.preventDefault();
+      const rect = wrap.getBoundingClientRect();
+      const mouseX = event.clientX - rect.left;
+      const mouseY = event.clientY - rect.top;
+      const graphX = (wrap.scrollLeft + mouseX) / zoom;
+      const graphY = (wrap.scrollTop + mouseY) / zoom;
+      const factor = Math.max(0.75, Math.min(1.25, Math.exp(-event.deltaY * 0.0018)));
+      const next = Math.max(0.1, Math.min(3, zoom * factor));
+      if (next === zoom) {
+        return;
+      }
+      zoom = next;
+      applyZoom();
+      wrap.scrollLeft = graphX * zoom - mouseX;
+      wrap.scrollTop = graphY * zoom - mouseY;
+    }, { passive: false });
 
     function applyZoom() {
       const width = Math.round(graphWidth * zoom);
