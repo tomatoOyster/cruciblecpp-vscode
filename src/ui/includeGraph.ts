@@ -230,6 +230,7 @@ export function includeGraphHtml(data: AnalysisData, nonce: string): string {
     document.getElementById('all').addEventListener('click', () => {
       depthInput.value = String(maxDepth);
       draw(maxDepth, systemInput.checked);
+      fitToWidth();
     });
     document.getElementById('fit').addEventListener('click', fitToWidth);
     document.getElementById('zoomIn').addEventListener('click', () => {
