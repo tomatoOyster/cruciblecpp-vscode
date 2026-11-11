@@ -4,6 +4,8 @@ test/**
 node_modules/**
 out/**
 coverage/**
+build-vscode/**
+*.vsix
 **/*.map
 **/*.ts
 .gitignore

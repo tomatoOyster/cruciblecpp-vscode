@@ -7,7 +7,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tomatoOyster/cruciblecpp-preprocessor"
+    "url": "https://github.com/tomatoOyster/cruciblecpp-vscode"
+  },
+  "homepage": "https://github.com/tomatoOyster/cruciblecpp-vscode#readme",
+  "bugs": {
+    "url": "https://github.com/tomatoOyster/cruciblecpp-vscode/issues"
   },
   "engines": {
     "vscode": "^1.85.0"

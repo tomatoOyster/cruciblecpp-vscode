@@ -2,6 +2,9 @@
 
 A thin VS Code front-end for `cruciblecpp-preprocessor.exe`.
 
+The preprocessor is maintained at
+[`tomatoOyster/cruciblecpp-preprocessor`](https://github.com/tomatoOyster/cruciblecpp-preprocessor).
+
 ## Features
 
 - Preprocess the current C/C++ file with CrucibleCpp.
