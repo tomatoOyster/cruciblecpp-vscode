@@ -39,8 +39,14 @@ export function includeGraphHtml(data: AnalysisData, nonce: string): string {
     cursor: pointer;
     font: inherit;
   }
-  .wrap { overflow: auto; border: 1px solid var(--vscode-panel-border, #555); border-radius: 8px; background: var(--vscode-editor-background, #1e1e1e); }
-  svg { display: block; min-width: 100%; }
+  .wrap {
+    max-height: calc(100vh - 190px);
+    overflow: auto;
+    border: 1px solid var(--vscode-panel-border, #555);
+    border-radius: 8px;
+    background: var(--vscode-editor-background, #1e1e1e);
+  }
+  svg { display: block; }
   text { font-family: var(--vscode-font-family, sans-serif); font-size: 12px; fill: var(--vscode-foreground, #ddd); }
   .edge { stroke: var(--vscode-editorLineNumber-foreground, #999); stroke-width: 1.2; opacity: .8; }
   .edge:hover { stroke: var(--vscode-focusBorder, #007fd4); opacity: 1; }
@@ -57,6 +63,10 @@ export function includeGraphHtml(data: AnalysisData, nonce: string): string {
   <div class="toolbar">
     <label>Depth <input id="depth" type="range" min="0" value="2"><span id="depthLabel">2</span></label>
     <button id="all">Show all</button>
+    <button id="fit">Fit</button>
+    <button id="zoomOut">-</button>
+    <span id="zoomLabel">100%</span>
+    <button id="zoomIn">+</button>
     <label><input id="system" type="checkbox" checked> System headers</label>
     <span class="stats" id="stats"></span>
   </div>
@@ -102,6 +112,10 @@ export function includeGraphHtml(data: AnalysisData, nonce: string): string {
     const systemInput = document.getElementById('system');
     const stats = document.getElementById('stats');
     const wrap = document.getElementById('wrap');
+    const zoomLabel = document.getElementById('zoomLabel');
+    let graphWidth = 1;
+    let graphHeight = 1;
+    let zoom = 1;
     depthInput.max = String(maxDepth);
     depthInput.value = String(Math.min(2, maxDepth));
     depthLabel.textContent = depthInput.value;
@@ -115,6 +129,22 @@ export function includeGraphHtml(data: AnalysisData, nonce: string): string {
     svg.appendChild(edgeLayer);
     svg.appendChild(nodeLayer);
     wrap.appendChild(svg);
+
+    function applyZoom() {
+      const width = Math.round(graphWidth * zoom);
+      const height = Math.round(graphHeight * zoom);
+      svg.setAttribute('width', String(width));
+      svg.setAttribute('height', String(height));
+      svg.style.width = width + 'px';
+      svg.style.height = height + 'px';
+      zoomLabel.textContent = Math.round(zoom * 100) + '%';
+    }
+
+    function fitToWidth() {
+      const available = Math.max(240, wrap.clientWidth - 4);
+      zoom = Math.min(1, available / graphWidth);
+      applyZoom();
+    }
 
     function draw(limit, showSystem) {
       edgeLayer.replaceChildren();
@@ -182,9 +212,10 @@ export function includeGraphHtml(data: AnalysisData, nonce: string): string {
         nodeLayer.appendChild(group);
       }
 
-      svg.setAttribute('width', String(width));
-      svg.setAttribute('height', String(height));
+      graphWidth = width;
+      graphHeight = height;
       svg.setAttribute('viewBox', '0 0 ' + width + ' ' + height);
+      applyZoom();
       stats.textContent = 'Showing ' + positions.size + ' / ' + allFiles.size +
         ' files · ' + visibleEdges + ' / ' + data.includes.length + ' edges';
       depthLabel.textContent = String(limit);
@@ -199,6 +230,15 @@ export function includeGraphHtml(data: AnalysisData, nonce: string): string {
     document.getElementById('all').addEventListener('click', () => {
       depthInput.value = String(maxDepth);
       draw(maxDepth, systemInput.checked);
+    });
+    document.getElementById('fit').addEventListener('click', fitToWidth);
+    document.getElementById('zoomIn').addEventListener('click', () => {
+      zoom = Math.min(2, zoom + 0.1);
+      applyZoom();
+    });
+    document.getElementById('zoomOut').addEventListener('click', () => {
+      zoom = Math.max(0.1, zoom - 0.1);
+      applyZoom();
     });
     draw(Number(depthInput.value), systemInput.checked);
   </script>
