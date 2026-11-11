@@ -11,9 +11,14 @@ import {
   readCompileCommands,
   ToolchainFlags,
 } from "./core/compileCommands";
+import { parseAnalysis } from "./core/analysis";
 import { parseDiagnostics } from "./core/diagnostics";
 import { resolveExecutable, resolveGcc } from "./core/paths";
 import { runProcess, ProcessResult } from "./core/process";
+import {
+  includeGraphHtml,
+  macroAnimationHtml,
+} from "./ui/analysisWebview";
 
 const PREVIEW_SCHEME = "cruciblecpp-preview";
 
@@ -256,6 +261,7 @@ function publishDiagnostics(
 async function preprocessDocument(
   document: vscode.TextDocument,
   lineMarkers?: boolean,
+  analysisPath?: string,
 ): Promise<Outcome | undefined> {
   if (!(await ensureSaved(document))) {
     return undefined;
@@ -278,6 +284,10 @@ async function preprocessDocument(
     settings,
     toolchain,
   );
+  if (analysisPath) {
+    // buildPreprocessArgs ends with: <source> -o <output>
+    args.splice(args.length - 3, 0, "--analysis-json", analysisPath);
+  }
 
   outputChannel.appendLine(`> "${executable}" ${args.map((arg) => JSON.stringify(arg)).join(" ")}`);
   const result = await vscode.window.withProgress(
@@ -453,6 +463,97 @@ async function commandCompare(document: vscode.TextDocument): Promise<void> {
   );
 }
 
+function randomNonce(): string {
+  return crypto.randomBytes(16).toString("base64").replace(/[^A-Za-z0-9]/g, "");
+}
+
+function analysisPath(document: vscode.TextDocument): string {
+  return temporaryOutput(document, "analysis").replace(/\.i$/, ".json");
+}
+
+async function commandMacroAnimation(
+  document: vscode.TextDocument,
+): Promise<void> {
+  const analysisFile = analysisPath(document);
+  const outcome = await preprocessDocument(document, false, analysisFile);
+  if (!outcome || outcome.cancelled) {
+    return;
+  }
+  if (!fs.existsSync(analysisFile)) {
+    vscode.window.showErrorMessage(
+      "CrucibleCpp: no analysis data was produced. See Output.",
+    );
+    return;
+  }
+  const data = parseAnalysis(fs.readFileSync(analysisFile, "utf8"));
+  if (!data) {
+    vscode.window.showErrorMessage(
+      "CrucibleCpp: invalid analysis data. See Output.",
+    );
+    return;
+  }
+  const panel = vscode.window.createWebviewPanel(
+    "cruciblecpp.macroAnimation",
+    "CrucibleCpp: Macro Expansion",
+    vscode.ViewColumn.Beside,
+    { enableScripts: true, retainContextWhenHidden: true },
+  );
+  panel.webview.html = macroAnimationHtml(data, document.uri.fsPath, randomNonce());
+}
+
+async function commandIncludeGraph(
+  document: vscode.TextDocument,
+): Promise<void> {
+  const analysisFile = analysisPath(document);
+  const outcome = await preprocessDocument(document, false, analysisFile);
+  if (!outcome || outcome.cancelled) {
+    return;
+  }
+  if (!fs.existsSync(analysisFile)) {
+    vscode.window.showErrorMessage(
+      "CrucibleCpp: no analysis data was produced. See Output.",
+    );
+    return;
+  }
+  const data = parseAnalysis(fs.readFileSync(analysisFile, "utf8"));
+  if (!data) {
+    vscode.window.showErrorMessage(
+      "CrucibleCpp: invalid analysis data. See Output.",
+    );
+    return;
+  }
+  const root = workspaceRoot(document);
+  const panel = vscode.window.createWebviewPanel(
+    "cruciblecpp.includeGraph",
+    "CrucibleCpp: Include Graph",
+    vscode.ViewColumn.Beside,
+    { enableScripts: true, retainContextWhenHidden: true },
+  );
+  panel.webview.onDidReceiveMessage((message: unknown) => {
+    if (
+      message &&
+      typeof message === "object" &&
+      (message as { type?: string }).type === "open"
+    ) {
+      const file = (message as { path?: string }).path;
+      if (!file) {
+        return;
+      }
+      const target = path.isAbsolute(file) ? file : path.resolve(root, file);
+      if (!fs.existsSync(target)) {
+        vscode.window.showWarningMessage(
+          `CrucibleCpp: included file no longer exists: ${target}`,
+        );
+        return;
+      }
+      void vscode.window.showTextDocument(vscode.Uri.file(target), {
+        preview: true,
+      });
+    }
+  });
+  panel.webview.html = includeGraphHtml(data, randomNonce());
+}
+
 async function commandShowGccInfo(): Promise<void> {
   const folder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
   const root = folder ?? process.cwd();
@@ -538,6 +639,30 @@ export function activate(context: vscode.ExtensionContext): void {
           : vscode.window.activeTextEditor?.document;
         if (document) {
           return commandCompare(document);
+        }
+        return undefined;
+      },
+    ),
+    vscode.commands.registerCommand(
+      "cruciblecpp.showMacroAnimation",
+      (uri?: vscode.Uri) => {
+        const document = uri
+          ? vscode.workspace.textDocuments.find((doc) => doc.uri.toString() === uri.toString())
+          : vscode.window.activeTextEditor?.document;
+        if (document) {
+          return commandMacroAnimation(document);
+        }
+        return undefined;
+      },
+    ),
+    vscode.commands.registerCommand(
+      "cruciblecpp.showIncludeGraph",
+      (uri?: vscode.Uri) => {
+        const document = uri
+          ? vscode.workspace.textDocuments.find((doc) => doc.uri.toString() === uri.toString())
+          : vscode.window.activeTextEditor?.document;
+        if (document) {
+          return commandIncludeGraph(document);
         }
         return undefined;
       },

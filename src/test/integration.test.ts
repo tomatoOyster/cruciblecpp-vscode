@@ -4,6 +4,7 @@ import * as path from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { buildPreprocessArgs, PreprocessSettings } from "../core/args";
+import { parseAnalysis } from "../core/analysis";
 import { emptyFlags } from "../core/compileCommands";
 import { parseDiagnostics } from "../core/diagnostics";
 import { resolveExecutable } from "../core/paths";
@@ -56,6 +57,35 @@ describe.skipIf(!fs.existsSync(executable))("CLI integration", () => {
       expect(fs.existsSync(output)).toBe(true);
       expect(parseDiagnostics(result.stderr)).toEqual([]);
       expect(fs.readFileSync(output, "utf8")).toContain("int main");
+    } finally {
+      fs.rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
+  it("collects include edges and macro trace", async () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "cruciblecpp-vscode-"));
+    try {
+      const source = path.join(directory, "analysis.cpp");
+      const output = path.join(directory, "analysis.i");
+      const analysis = path.join(directory, "analysis.json");
+      fs.writeFileSync(
+        source,
+        '#include <vector>\n#define FOO 41\n#define BAR (FOO + 1)\n#if BAR\nint value = BAR;\n#endif\n',
+        "utf8",
+      );
+      const args = buildPreprocessArgs(
+        source,
+        output,
+        settings,
+        emptyFlags(),
+      );
+      args.splice(args.length - 3, 0, "--analysis-json", analysis);
+      const result = await runProcess(executable, args, directory);
+      expect(result.code).toBe(0);
+      const data = parseAnalysis(fs.readFileSync(analysis, "utf8"));
+      expect(data).toBeDefined();
+      expect(data?.includes.length).toBeGreaterThan(0);
+      expect(data?.macros.some((event) => event.macro === "FOO")).toBe(true);
     } finally {
       fs.rmSync(directory, { recursive: true, force: true });
     }

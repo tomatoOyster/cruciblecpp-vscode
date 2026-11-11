@@ -2,7 +2,7 @@
   "name": "cruciblecpp-vscode",
   "displayName": "CrucibleCpp Preprocessor",
   "description": "Run the CrucibleCpp preprocessor on the current C/C++ file, inspect the result, and compare it with g++ -E.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "tomatoOyster",
   "license": "MIT",
   "repository": {
@@ -31,6 +31,8 @@
     "onCommand:cruciblecpp.preview",
     "onCommand:cruciblecpp.savePreprocessed",
     "onCommand:cruciblecpp.compareWithGcc",
+    "onCommand:cruciblecpp.showMacroAnimation",
+    "onCommand:cruciblecpp.showIncludeGraph",
     "onCommand:cruciblecpp.showGccInfo",
     "onCommand:cruciblecpp.showOutput"
   ],
@@ -54,6 +56,14 @@
         "title": "CrucibleCpp: Compare with g++ -E"
       },
       {
+        "command": "cruciblecpp.showMacroAnimation",
+        "title": "CrucibleCpp: Macro Expansion Animation"
+      },
+      {
+        "command": "cruciblecpp.showIncludeGraph",
+        "title": "CrucibleCpp: Include Graph"
+      },
+      {
         "command": "cruciblecpp.showGccInfo",
         "title": "CrucibleCpp: Show GCC Info"
       },
@@ -73,6 +83,16 @@
           "command": "cruciblecpp.compareWithGcc",
           "when": "editorLangId == cpp || editorLangId == c",
           "group": "navigation@91"
+        },
+        {
+          "command": "cruciblecpp.showMacroAnimation",
+          "when": "editorLangId == cpp || editorLangId == c",
+          "group": "navigation@92"
+        },
+        {
+          "command": "cruciblecpp.showIncludeGraph",
+          "when": "editorLangId == cpp || editorLangId == c",
+          "group": "navigation@93"
         }
       ]
     },
@@ -91,31 +111,44 @@
         },
         "cruciblecpp.includeDirs": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "default": [],
           "description": "Additional -I directories."
         },
         "cruciblecpp.systemIncludeDirs": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "default": [],
           "description": "Additional -isystem directories."
         },
         "cruciblecpp.defines": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "default": [],
           "description": "Additional -D definitions, for example NAME or NAME=VALUE."
         },
         "cruciblecpp.undefines": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "default": [],
           "description": "Additional -U macro names."
         },
         "cruciblecpp.standard": {
           "type": "string",
-          "enum": ["default", "c++17", "c++20", "c++23"],
+          "enum": [
+            "default",
+            "c++17",
+            "c++20",
+            "c++23"
+          ],
           "default": "default",
           "description": "Value passed to -std=. 'default' uses compile_commands.json or c++20."
         },
@@ -141,7 +174,9 @@
         },
         "cruciblecpp.extraArgs": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "default": [],
           "description": "Extra arguments appended before the input file."
         },

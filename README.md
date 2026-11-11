@@ -14,6 +14,8 @@ The preprocessor is maintained at
 - Compare CrucibleCpp output with `g++ -E` using VS Code's diff editor.
 - Read include paths and defines from `compile_commands.json`.
 - Show the GCC path and include directories discovered by CrucibleCpp.
+- Animate the macro expansion trace in a webview.
+- Render the include graph in a webview; click a node to open the file.
 
 ## Requirements
 
@@ -58,8 +60,14 @@ For GCC comparison and GCC info, set `cruciblecpp.gccPath` if `g++.exe` is not o
 - `CrucibleCpp: Preprocess and Preview to Side`
 - `CrucibleCpp: Save Preprocessed File`
 - `CrucibleCpp: Compare with g++ -E`
+- `CrucibleCpp: Macro Expansion Animation`
+- `CrucibleCpp: Include Graph`
 - `CrucibleCpp: Show GCC Info`
 - `CrucibleCpp: Show Output`
+
+The macro animation and include graph require a preprocessor build with
+`--analysis-json` support (the local development build includes it; the
+`v2.1.0` release does not).
 
 ## `compile_commands.json`
 
