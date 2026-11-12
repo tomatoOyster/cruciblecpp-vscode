@@ -73,7 +73,24 @@ For GCC comparison and GCC info, set `cruciblecpp.gccPath` if `g++.exe` is not o
 - `CrucibleCpp: Show GCC Info`
 - `CrucibleCpp: Show Output`
 
-The macro animation and include graph require CrucibleCpp **2.2.0** or newer, which adds `--analysis-json` support.
+The macro animation and include graph require CrucibleCpp **2.2.0** or newer, which adds `--analysis-json` support. PCH diagnostics require **2.3.0** or newer.
+
+## Precompiled headers
+
+GCC `.gch` files are ignored by default, matching `g++ -E`. Use:
+
+```json
+"cruciblecpp.pchPolicy": "ignore"
+```
+
+Options:
+
+- `ignore`: silently preprocess the header source (default)
+- `warn`: report ignored `.gch` files in Problems
+- `error`: fail when a `.gch` is encountered
+- `report`: record ignored files in the analysis JSON
+
+`-Winvalid-pch` / `-Wno-invalid-pch` from build systems are accepted by the CLI.
 
 ## `compile_commands.json`
 

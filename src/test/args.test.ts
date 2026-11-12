@@ -47,6 +47,16 @@ describe("argument builder", () => {
     ]);
   });
 
+  it("passes an explicit PCH policy", () => {
+    const args = buildPreprocessArgs(
+      "main.cpp",
+      "main.i",
+      { ...settings, pchPolicy: "error" },
+      emptyFlags(),
+    );
+    expect(args).toContain("--pch=error");
+  });
+
   it("builds g++ comparison arguments", () => {
     const args = buildGccArgs("main.cpp", "gcc.i", settings, emptyFlags());
     expect(args.slice(0, 2)).toEqual(["-E", "-P"]);

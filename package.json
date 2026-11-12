@@ -2,7 +2,7 @@
   "name": "cruciblecpp-vscode",
   "displayName": "CrucibleCpp Preprocessor",
   "description": "Run the CrucibleCpp preprocessor on the current C/C++ file, inspect the result, and compare it with g++ -E.",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "publisher": "tomatoOyster",
   "license": "MIT",
   "repository": {
@@ -171,6 +171,17 @@
           "type": "boolean",
           "default": false,
           "description": "Pass -funsigned-char."
+        },
+        "cruciblecpp.pchPolicy": {
+          "type": "string",
+          "enum": [
+            "ignore",
+            "warn",
+            "error",
+            "report"
+          ],
+          "default": "ignore",
+          "description": "GCC .gch handling. ignore matches g++ -E; warn/error/report add diagnostics. Requires CrucibleCpp 2.3.0+."
         },
         "cruciblecpp.extraArgs": {
           "type": "array",

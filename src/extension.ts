@@ -72,6 +72,7 @@ function settingsFor(root: string): PreprocessSettings {
     inputCharset: config.get<string>("inputCharset", "UTF-8"),
     executionCharset: config.get<string>("executionCharset", "UTF-8"),
     unsignedChar: config.get<boolean>("unsignedChar", false),
+    pchPolicy: config.get<string>("pchPolicy", "ignore"),
     extraArgs: config.get<string[]>("extraArgs", []),
   };
 }

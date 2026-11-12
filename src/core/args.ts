@@ -10,6 +10,7 @@ export interface PreprocessSettings {
   inputCharset: string;
   executionCharset: string;
   unsignedChar: boolean;
+  pchPolicy?: string;
   extraArgs: string[];
 }
 
@@ -69,6 +70,9 @@ export function buildPreprocessArgs(
   }
   if (settings.unsignedChar) {
     args.push("-funsigned-char");
+  }
+  if (settings.pchPolicy && settings.pchPolicy !== "ignore") {
+    args.push(`--pch=${settings.pchPolicy}`);
   }
   args.push(...settings.extraArgs);
   args.push(sourceFile, "-o", outputFile);
