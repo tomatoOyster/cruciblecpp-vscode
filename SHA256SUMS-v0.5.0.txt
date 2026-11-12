@@ -1,1 +1,0 @@
-1fe505e0a774ad5e1aed8cb8d06219f4f27c6abc879bf3050c9f4ef87c921c5b  cruciblecpp-vscode-0.5.0.vsix

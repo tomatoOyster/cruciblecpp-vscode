@@ -4,3 +4,5 @@ out/
 *.vsix
 coverage/
 build-vscode/
+SHA256SUMS*.txt
+
