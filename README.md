@@ -117,6 +117,7 @@ The extension picks the entry for the current file and extracts:
 - The extension is Windows-only, matching the preprocessor.
 - It preprocesses saved files; unsaved documents are saved first by default.
 - The preview is read-only.
+- The PCH artifact cache is currently CLI-only; the extension exposes `cruciblecpp.pchPolicy` but not cache directory/locking/statistics settings.
 - `-fexec-charset` currently affects `#if` character constants only in CrucibleCpp; string literals are not transcoded yet.
 - The extension calls the CLI as a child process; it does not link the C++ core.
 
